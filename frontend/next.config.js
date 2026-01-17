@@ -4,7 +4,7 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['localhost', 'your-backend-domain.com'], // Add your backend domain here
+    domains: ['localhost', 'todo-hackathon-phase-3-backend.vercel.app'],
   },
 };
 

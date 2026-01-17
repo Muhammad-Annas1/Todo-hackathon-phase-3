@@ -10,8 +10,12 @@ load_dotenv()
 # Get database URL from environment
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Create the database engine
-engine = create_engine(DATABASE_URL, echo=False)
+# Create the database engine if URL is available
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL, echo=False)
+else:
+    print("⚠️ WARNING: DATABASE_URL is not set!")
+    engine = None
 
 
 def get_session() -> Generator:

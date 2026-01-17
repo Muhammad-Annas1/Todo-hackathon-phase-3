@@ -23,20 +23,17 @@ async def log_requests(request, call_next):
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     os.getenv("FRONTEND_URL", ""),
     os.getenv("BETTER_AUTH_URL", ""),
 ]
-# Remove empty strings if variables are not set
-allowed_origins = [origin for origin in allowed_origins if origin]
+# Remove empty strings and ensure no trailing slashes
+allowed_origins = [origin.rstrip('/') for origin in allowed_origins if origin]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
@@ -56,8 +53,15 @@ async def startup_event():
     # Create database tables
     from sqlmodel import SQLModel
     from core.database import engine
-    SQLModel.metadata.create_all(engine)
-    print("Database tables created")
+    
+    if engine:
+        try:
+            SQLModel.metadata.create_all(engine)
+            print("✅ Database tables verified/created")
+        except Exception as e:
+            print(f"❌ Error creating tables: {e}")
+    else:
+        print("❌ Skip table creation: engine is None")
 
 @app.get("/")
 def read_root():

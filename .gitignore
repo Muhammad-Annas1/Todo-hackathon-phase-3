@@ -29,6 +29,13 @@ yarn-error.log*
 *.swp
 *.swo
 
+# Logs and Debug Files
+*.log
+*_debug*.txt
+flow_output*.txt
+test_crud_output.txt
+null
+
 # OS
 .DS_Store
 Thumbs.db

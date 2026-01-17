@@ -27,7 +27,6 @@ export interface TaskSummary {
   overdue: number;
   message: string;
 }
-
 // Initialize the auth client
 const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
@@ -51,32 +50,22 @@ class ApiClient {
     this.token = token;
   }
 
-  // Get the JWT token from Better Auth or local storage
+  // Get the JWT token from local storage
   async getToken(): Promise<string | null> {
-    // Try to get token from Better Auth first
-    try {
-      const { data: sessionData } = authClient.useSession.get();
-      if (sessionData) {
-        // In Better Auth 0.2, the session object might be nested or named differently
-        // If 'token' is not directly on session, we might need to find where it is
-        // Common pattern: sessionData.session.token or similar
-        return (sessionData as any).session?.token || (sessionData as any).token;
-      }
-    } catch (error) {
-      console.warn('Better Auth session not available, trying local storage');
-    }
-
-    // Fallback to local storage
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
+      const token = localStorage.getItem('auth_token');
+      console.log('🔑 getToken from localStorage:', token ? 'Found' : 'Missing');
+      return token;
     }
-
     return null;
   }
 
   // Generic request method with JWT handling
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    // Robustly join base URL and endpoint (avoid double slashes or missing slashes)
+    const normalizedBase = this.baseUrl.replace(/\/$/, '');
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${normalizedBase}${normalizedEndpoint}`;
 
     // Get token for this request
     const token = await this.getToken();
@@ -92,12 +81,24 @@ class ApiClient {
       headers,
     };
 
+    console.log(`🚀 API Request: ${config.method || 'GET'} ${url}`, {
+      headers: { ...headers, Authorization: token ? 'Bearer [HIDDEN]' : 'none' },
+      body: config.body ? JSON.parse(config.body as string) : null
+    });
+
     try {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `API request failed: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`❌ API Error (${response.status}):`, errorText);
+        let errorData = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { message: errorText };
+        }
+        throw new Error((errorData as any).message || (errorData as any).detail || `API request failed: ${response.status} ${response.statusText}`);
       }
 
       // For 204 No Content responses, return null
@@ -105,11 +106,19 @@ class ApiClient {
         return null as T;
       }
 
-      return response.json();
-    } catch (error) {
+      const data = await response.json();
+      console.log(`✅ API Success: ${url}`, data);
+      return data;
+    } catch (error: any) {
+      console.error(`💥 Fetch Exception for ${url}:`, {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+
       // Handle network errors
-      if (error instanceof TypeError) {
-        throw new Error('Network error: Please check your connection and try again');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to reach the backend server. Please ensure the backend is running at ' + this.baseUrl);
       }
       throw error;
     }

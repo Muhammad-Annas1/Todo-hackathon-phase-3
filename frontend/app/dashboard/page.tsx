@@ -10,6 +10,7 @@ import TaskCard from '../../components/TaskCard';
 import GlassCard from '../../components/GlassCard';
 import Modal from '../../components/Modal';
 import TaskForm from '../../components/TaskForm';
+import ChatIcon from '../../components/Chat/ChatIcon';
 import toast from 'react-hot-toast';
 
 const DashboardPage = () => {
@@ -136,6 +137,9 @@ const DashboardPage = () => {
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Task">
           <TaskForm onSubmit={handleCreateTask} onCancel={() => setIsModalOpen(false)} />
         </Modal>
+
+        {/* Chat Icon */}
+        <ChatIcon />
       </div>
     </ProtectedRoute>
   );

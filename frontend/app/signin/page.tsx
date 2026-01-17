@@ -20,17 +20,24 @@ const SigninPage = () => {
     setLoading(true);
 
     try {
+      console.log('🚀 Attempting signin for:', email);
       const response = await signin({ email, password });
+      console.log('✅ Signin response received:', { hasToken: !!response?.token });
 
       if (typeof window !== 'undefined' && response.token) {
+        console.log('💾 Saving token to localStorage');
         localStorage.setItem('auth_token', response.token);
+        // Also set on instance immediately
+        const { apiClient } = await import('../../lib/api');
+        apiClient.setToken(response.token);
       }
 
       toast.success('Signin successful!');
+      console.log('⏭️ Redirecting to /dashboard...');
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Signin error:', error);
-      toast.error('Signin failed. Please check your credentials.');
+    } catch (error: any) {
+      console.error('❌ Signin error:', error);
+      toast.error(error.message || 'Signin failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

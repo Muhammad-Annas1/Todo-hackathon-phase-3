@@ -10,7 +10,7 @@ from core.database import get_session
 from schemas.user import UserRead
 from pydantic import BaseModel
 
-from dependencies import get_db, get_current_active_user
+from dependencies import get_db, get_current_active_user, get_optional_user
 
 router = APIRouter()
 
@@ -48,16 +48,22 @@ def signup(credentials: AuthCredentials, db: Session = Depends(get_db)):
     
     # Create new user
     user_id = str(uuid.uuid4())
-    new_user = User(
-        id=user_id, 
-        email=credentials.email, 
-        name=credentials.name or credentials.email.split('@')[0],
-        hashed_password=get_password_hash(credentials.password),
-        created_at=datetime.utcnow()
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        new_user = User(
+            id=user_id, 
+            email=credentials.email, 
+            name=credentials.name or credentials.email.split('@')[0],
+            hashed_password=get_password_hash(credentials.password),
+            created_at=datetime.utcnow()
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        print(f"Signup Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
     
     token = create_access_token({"user_id": user_id, "email": credentials.email, "name": new_user.name})
     return {"user": new_user, "token": token}
@@ -72,6 +78,29 @@ def signin(credentials: AuthCredentials, db: Session = Depends(get_db)):
     
     token = create_access_token({"user_id": user.id, "email": user.email, "name": user.name})
     return {"user": user, "token": token}
+
+@router.get("/auth/session")
+def get_session_info(user: Optional[User] = Depends(get_optional_user)):
+    """
+    Handle better-auth session check requests.
+    Returns session data if authenticated, otherwise returns null/empty.
+    """
+    if not user:
+        return {"session": None, "user": None}
+    
+    # Return session info in a format better-auth client might expect
+    return {
+        "session": {
+            "token": "from-local-storage", # Client primarily uses localStorage in this setup
+            "userId": user.id,
+            "expiresAt": (datetime.utcnow() + timedelta(days=7)).isoformat()
+        },
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name
+        }
+    }
 
 @router.get("/auth/me")
 def get_me(user: User = Depends(get_current_active_user)):

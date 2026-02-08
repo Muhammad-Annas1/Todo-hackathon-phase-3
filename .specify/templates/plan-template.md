@@ -31,7 +31,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Gates determined based on constitution file:
+- All infrastructure must be defined as code (Dockerfiles, Helm charts, K8s manifests)
+- AI tools (Gordon, kubectl-ai, kagent) must be used for generation and operations
+- Containerization requirements must be followed (multi-stage builds, minimal images)
+- Kubernetes deployment must target Minikube only
+- Security constraints (Secrets/ConfigMaps) must be observed
 
 ## Project Structure
 

@@ -29,7 +29,7 @@ export interface TaskSummary {
 }
 // Initialize the auth client
 const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://192.168.49.2/api',
 });
 
 class ApiClient {
@@ -37,7 +37,7 @@ class ApiClient {
   private token: string | null = null;
 
   constructor() {
-    let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    let url = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.49.2/api';
     // Ensure the URL ends with /api for the ApiClient
     if (!url.endsWith('/api')) {
       url = url.replace(/\/$/, '') + '/api';

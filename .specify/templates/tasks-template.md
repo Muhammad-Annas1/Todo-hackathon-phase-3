@@ -12,6 +12,8 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+**Constitution Compliance**: All tasks must comply with the project constitution, especially regarding infrastructure as code, AI-assisted DevOps, and security practices.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -68,6 +70,9 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
+- [ ] T010 Setup Docker environment and AI-assisted Dockerfile generation with Gordon
+- [ ] T011 [P] Create Helm chart structure for Kubernetes deployment
+- [ ] T012 Setup Minikube cluster for local Kubernetes deployment
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -156,6 +161,9 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
+- [ ] TXXX [P] Kubernetes deployment validation on Minikube
+- [ ] TXXX Configure Kubernetes Secrets and ConfigMaps for environment variables
+- [ ] TXXX AI-assisted DevOps validation using kubectl-ai and kagent
 
 ---
 

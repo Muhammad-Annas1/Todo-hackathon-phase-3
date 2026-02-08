@@ -1,52 +1,52 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 2.0.0
-- Modified principles: All principles updated for Phase III
-- Added sections: AI Integration, Cohere API usage
-- Removed sections: Phase II specific constraints
+- Version change: 2.0.0 → 3.0.0
+- Modified principles: Updated for Phase IV - Cloud-Native Local Kubernetes Deployment
+- Added sections: Containerization, Helm Charts, Minikube, AI-Assisted DevOps
+- Removed sections: Phase III specific constraints (AI Integration, Cohere API usage)
 - Templates requiring updates:
-  - .specify/templates/plan-template.md ⚠ pending
-  - .specify/templates/spec-template.md ⚠ pending
-  - .specify/templates/tasks-template.md ⚠ pending
+  - .specify/templates/plan-template.md ✅ updated
+  - .specify/templates/spec-template.md ✅ updated
+  - .specify/templates/tasks-template.md ✅ updated
   - .specify/templates/commands/*.md ⚠ pending
-- Follow-up TODOs: Update templates to reflect Phase III changes
+- Follow-up TODOs: None
 -->
 
 # Todo Constitution
 
 ## Core Principles
 
-### I. Code Quality & AI Integration
-Every code contribution must follow established standards: Python (backend) requires PEP 8 compliance with type hints and clean functions; TypeScript (frontend) requires strict typing with no 'any' types; All functions must have single responsibility with meaningful names and proper error handling; AI integration must use Cohere API exclusively with proper SDK implementation.
+### I. Code Quality & Infrastructure as Code
+Every infrastructure contribution must follow established standards: Dockerfiles require multi-stage builds with minimal base images and security best practices; Helm charts require versioning, linting with sane defaults in values.yaml; Kubernetes manifests must be clean, idempotent with proper labels and selectors; All infrastructure code must be generated via AI tools with human review.
 
-### II. User Experience
-The application must provide a responsive, mobile-first UI using Tailwind CSS; The dashboard must be intuitive with a clear task list, add button, and auth flow; All user interactions must provide clear feedback including loading states and toast notifications for success/error messages; Natural language interactions through the chatbot must feel conversational and helpful.
+### II. Cloud-Native Architecture
+The application must be deployed as containerized microservices on Kubernetes; The system must run reliably on local Minikube cluster with proper service discovery; All deployments must be scalable and resilient with health checks; Infrastructure must follow 12-factor app methodology for containerized environments.
 
-### III. Test-First (NON-NEGOTIABLE)
-TDD is mandatory: Tests written → User approved → Tests fail → Then implement; The Red-Green-Refactor cycle must be strictly enforced; All features must have corresponding tests before being considered complete.
+### III. Containerization Excellence
+All services must be packaged as optimized Docker images using multi-stage builds; Images must be minimal in size with security scanning passed; Dockerfiles must follow best practices including non-root users and proper layer caching; Gordon AI must be leveraged for Dockerfile generation and optimization.
 
-### IV. Security-First
-All API endpoints must be JWT-protected; User isolation must be enforced at the database level; Authentication must use Better Auth on frontend with JWT verification on backend using a shared secret; All sensitive data must be properly encrypted; Chat endpoint must verify JWT and enforce user isolation for conversations.
+### IV. Infrastructure as Code (Helm Charts)
+All Kubernetes resources must be defined in versioned Helm charts; Charts must include Deployments, Services, ConfigMaps, Secrets, and optional Ingress; Values.yaml must provide configurable parameters with sensible defaults; Helm charts must be linted and tested before deployment.
 
-### V. Persistence & Reliability
-All data must persist in Neon PostgreSQL database; The application must maintain data integrity across restarts; Database operations must be atomic and consistent; Error handling must prevent data loss; Conversation and message state must persist in DB between requests (stateless architecture).
+### V. Local Kubernetes Deployment
+Minikube must be used for local Kubernetes cluster deployment; The cluster must be single-node with necessary addons enabled (ingress, metrics-server); All services must be accessible via Minikube IP/port or service endpoints; Deployment must be repeatable and idempotent.
 
-### VI. Multi-User Isolation
-Each user must only see and modify their own tasks; User data must be properly isolated at the application and database level; Authentication and authorization must be verified for every request; User session management must be secure and reliable; Conversations must be isolated by user_id.
+### VI. AI-Assisted DevOps
+kubectl-ai, kagent, and Gordon must be used for Kubernetes operations and generation; Manual kubectl or helm commands are prohibited during hackathon evaluation; AI tools must be leveraged for troubleshooting, scaling, and cluster analysis; All DevOps operations must be documented with AI tool usage examples.
 
-### VII. AI Integration & Tool Calling
-Cohere API must be used exclusively for natural language understanding and tool calling; All task operations must be accessible through AI-powered tool calls; The system must handle natural language inputs and convert them to appropriate backend operations; Error handling must be graceful when tasks don't exist or inputs are invalid.
+### VII. Security & Configuration Management
+Sensitive data must be stored in Kubernetes Secrets with proper RBAC; Non-sensitive configuration must be managed via ConfigMaps; Environment variables must be securely passed to containers; Authentication and authorization must work in containerized environment.
 
 ## Technical Constraints
 
-Frontend: Next.js 16+ (App Router), TypeScript, Tailwind CSS
-Backend: FastAPI, SQLModel ORM, Neon PostgreSQL
-Auth: Better Auth (frontend) + JWT verification (backend, shared secret)
-AI: Cohere API only (no OpenAI), official SDK with COHERE_API_KEY
-API: RESTful, /api/tasks/* endpoints (existing), new /api/chat endpoint for AI
-Database: tasks table (existing), plus conversation and message tables for chat state
-Env Variables: COHERE_API_KEY, BETTER_AUTH_SECRET, DATABASE_URL
-Chat Architecture: Stateless (no server-side memory), conversation state in DB
+Containerization: Docker with multi-stage builds, minimal base images (alpine/node-slim)
+Orchestration: Kubernetes v1.28+ on Minikube
+Packaging: Helm 3+ charts with proper versioning and linting
+Services: Frontend (Next.js), Backend (FastAPI), Optional Redis for caching
+Infrastructure: Local only (Minikube + Docker Desktop), no cloud Kubernetes
+AI Tools: Gordon (Docker), kubectl-ai (Kubernetes), kagent (Analysis)
+Environment: COHERE_API_KEY, BETTER_AUTH_SECRET, DATABASE_URL via Secrets
+Dev Process: Spec-Driven Development with AI generation, human review
 
 ## Development Workflow
 
@@ -54,41 +54,45 @@ Chat Architecture: Stateless (no server-side memory), conversation state in DB
 - Qwen as ONLY model for code/spec generation (no Claude)
 - Reference specs with @specs/... syntax
 - Human must review & approve every generated code block
-- Preserve full spec history
+- Preserve full spec history in specs/infra/
 - Commit often with semantic messages
 - No manual coding allowed for hackathon evaluation
-- Adapt any OpenAI-style code to Cohere API implementation
+- Use Gordon/kubectl-ai/kagent for all DevOps operations
+- Maintain project structure with dedicated k8s/ and docker/ directories
 
-## Success Definition (Phase III Exit Criteria)
+## Success Definition (Phase IV Exit Criteria)
 
-☑ Chatbot handles all 5 task operations + user info via natural language
-☑ Cohere API fully integrated (COHERE_API_KEY used correctly)
-☑ Stateless: Conversations & state persist in Neon DB after restart
-☑ Full security: JWT verification, user isolation
-☑ Frontend chat UI works seamlessly with backend endpoint
-☑ No crashes: Invalid inputs, missing tasks, wrong IDs handled gracefully
-☑ README: Setup instructions, env vars, chat examples, Cohere key note
+☑ Frontend & backend containerized (Docker images built and optimized)
+☑ Helm chart created and deployed to Minikube successfully
+☑ App accessible via Minikube IP/port (chatbot works, tasks persist in Neon DB)
+☑ Gordon/kubectl-ai/kagent used in process with documented usage
+☑ Secrets/ConfigMaps handle env vars securely in Kubernetes
+☑ Full flow: Login → chat → add task → list → complete → all via Kubernetes pods
+☑ No crashes; pods healthy (kubectl get pods shows all running)
+☑ README: Step-by-step local setup, Minikube commands, AI tool usage, screenshots
 
-## Explicit Non-Goals for Phase III Basic
+## Explicit Non-Goals for Phase IV Basic
 
-× Real-time streaming (simple POST response)
-× Advanced Cohere features (fine-tuning, RAG)
-× Complex multi-turn chaining beyond basics
-× External chatbot UI libraries (build simple in Next.js)
-× Tests/CI (optional)
+× Cloud Kubernetes (EKS/GKE/AKS)
+× CI/CD pipelines
+× Advanced monitoring (Prometheus/Grafana)
+× Production-grade ingress/SSL
+× Multi-node cluster
+× Persistent volumes (Neon DB is external)
+× Manual kubectl/helm commands
 
 ## Governance
 
-This constitution is the supreme guiding document for Phase III of Todo - AI Chatbot Integration.
+This constitution is the supreme guiding document for Phase IV of Todo - Cloud-Native Local Kubernetes Deployment.
 Any deviation must be:
 - Explicitly justified
-- Documented in specs/history
+- Documented in specs/infra/
 - Approved by project owner
 
 All PRs/reviews must verify compliance with these principles.
 Complexity must be justified with clear benefits.
 
-Use Cohere API exclusively (with provided key).  
-Reuse Phase II infrastructure fully.
+Use AI DevOps tools exclusively (Gordon, kubectl-ai, kagent).
+Deploy on local Kubernetes only (Minikube).
 
-**Version**: 2.0.0 | **Ratified**: 2026-01-02 | **Last Amended**: 2026-01-09
+**Version**: 3.0.0 | **Ratified**: 2026-01-02 | **Last Amended**: 2026-01-30

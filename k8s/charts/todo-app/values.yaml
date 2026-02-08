@@ -1,0 +1,45 @@
+# Default values for todo-app.
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    NEXT_PUBLIC_API_URL: "/api"
+
+backend:
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    # This should match the ingress host
+    BETTER_AUTH_URL: "http://todo.local"
+
+secrets:
+  betterAuthSecret: "0ptqlUaq8uCH7lQPVd0Bl5ryd6VtLdOX"
+  cohereApiKey: "AOEX7Kpeys8EFBwFpVyL8al6J75TVy8yME0P1zNw"
+  databaseUrl: "postgresql://neondb_owner:npg_hJvC09KfQFab@ep-dry-smoke-a4zvp08s-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "todo.local"
+
+# Generic settings for probes and resources
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
